@@ -12,12 +12,10 @@ public interface UIRenderable {
     }
 
     default void drawColoredRect(long vg, float x, float y, float width, float height, UIColor color) {
-        nvgSave(vg);
         nvgBeginPath(vg);
         nvgRect(vg, x, y, width, height);
         nvgFillColor(vg, color.getVgColor());
         nvgFill(vg);
-        nvgRestore(vg);
     }
 
     default void drawColoredRoundedRect(long vg, float x, float y, float width, float height, float round, UIColor color) {
@@ -25,12 +23,10 @@ public interface UIRenderable {
     }
 
     default void drawColoredRoundedRect(long vg, float x, float y, float width, float height, float roundTopLeft, float roundTopRight, float roundBottomLeft, float roundBottomRight, UIColor color) {
-        nvgSave(vg);
         nvgBeginPath(vg);
         nvgRoundedRectVarying(vg, x, y, width, height, roundTopLeft, roundTopRight, roundBottomRight, roundBottomLeft);
         nvgFillColor(vg, color.getVgColor());
         nvgFill(vg);
-        nvgRestore(vg);
     }
 
     default void drawDropShadow(long vg, float hOffset, float vOffset, float x, float y, float width, float height, float round, float blur, float spread, UIColor colorOne, UIColor colorTwo, NVGPaint paint) {
@@ -44,13 +40,11 @@ public interface UIRenderable {
     }
 
     default void drawText(long vg, float x, float y, float fontSize, String text, String fontFamily, UIColor color) {
-        nvgSave(vg);
         nvgFontSize(vg, fontSize);
         nvgFontFace(vg, fontFamily);
         nvgFillColor(vg, color.getVgColor());
         nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE);
         nvgText(vg, x, y, text);
-        nvgRestore(vg);
     }
 
     default float[] calcTextBounds(long vg, float x, float y, String text, float[] textBounds) {

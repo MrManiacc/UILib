@@ -2,6 +2,7 @@ package me.jraynor.gui.logic;
 
 import lombok.Getter;
 import lombok.Setter;
+import me.jraynor.gui.elements.UIText;
 import me.jraynor.gui.logic.constraint.UIConstraint;
 
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ public class UIComponent implements Comparable<UIComponent>, Cloneable {
     @Setter
     private UIComponent parent;
     @Getter
+    @Setter
     private boolean active = true;
     @Getter
     @Setter
@@ -51,6 +53,9 @@ public class UIComponent implements Comparable<UIComponent>, Cloneable {
     protected void onAdded() {
     }
 
+    protected void onSiblingAdded(UIComponent sibling) {
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof UIComponent) {
@@ -70,6 +75,17 @@ public class UIComponent implements Comparable<UIComponent>, Cloneable {
         this(-1);
     }
 
+
+    public void setText(String text) {
+        if (this instanceof UIText) {
+            ((UIText) this).setText(text);
+        } else {
+            if (hasComponent(UIText.class)) {
+                UIText uiText = (UIText) getComponent(UIText.class);
+                uiText.setText(text);
+            }
+        }
+    }
 
     /**
      * This will attempt to replace the current UIComponent with specified class type
@@ -118,6 +134,11 @@ public class UIComponent implements Comparable<UIComponent>, Cloneable {
                 mappedChildren.put(uiComponent.getClass(), components);
             }
             uiComponent.onAdded();
+
+            for (UIComponent children : children) {
+                if (children.id != uiComponent.id)
+                    children.onSiblingAdded(uiComponent);
+            }
             return uiComponent;
         }
         return null;
@@ -176,38 +197,6 @@ public class UIComponent implements Comparable<UIComponent>, Cloneable {
         return super.clone();
     }
 
-    public UIConstraint getMaxY(UIComponent ignore) {
-        float max = -1;
-        UIConstraint maxConstraint = null;
-
-        for (UIComponent child : children) {
-            if (child.id == ignore.id)
-                continue;
-            if (child instanceof UIConstraint) {
-                UIConstraint constraint = (UIConstraint) child;
-                if (constraint.y - constraint.h > max) {
-                    maxConstraint = constraint;
-                    max = constraint.y - constraint.h;
-                }
-            } else {
-
-                for (UIComponent child2 : child.getChildren()) {
-                    if (child2 instanceof UIConstraint) {
-                        if (child2.id == ignore.id)
-                            continue;
-                        UIConstraint constraint = (UIConstraint) chil
-                        if (constraint.y - constraint.h > max) {
-                            maxConstraint = constraint;
-                            max = constraint.y - constraint.h;
-                        }
-                    }
-                }
-
-            }
-        }
-        return maxConstraint;
-    }
-
     public UIConstraint getMaxX(UIComponent ignore) {
         float max = -1;
         UIConstraint maxConstraint = null;
@@ -254,12 +243,13 @@ public class UIComponent implements Comparable<UIComponent>, Cloneable {
      * before it updates all of the component's children
      */
     public void update() {
-
-        onUpdate();
-        if (render)
-            render();
-        for (UIComponent uiComponent : children)
-            uiComponent.update();
+        if (active) {
+            onUpdate();
+            if (render)
+                render();
+            for (UIComponent uiComponent : children)
+                uiComponent.update();
+        }
     }
 
     /**

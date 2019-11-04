@@ -1,13 +1,11 @@
 package me.jraynor.gui.logic.constraint;
 
 import lombok.Getter;
-import lombok.Setter;
 import me.jraynor.Game;
 import me.jraynor.bootstrap.Window;
 import me.jraynor.gui.logic.UIComponent;
 
 import static me.jraynor.gui.logic.constraint.Constraints.*;
-import static me.jraynor.gui.logic.constraint.Constraints.ManualConstraint.NO_OVERRIDE;
 import static me.jraynor.gui.logic.constraint.Constraints.StickyConstraint.FACE.LEFT;
 import static me.jraynor.gui.logic.constraint.Constraints.StickyConstraint.FACE.TOP;
 
@@ -218,7 +216,7 @@ public class UIConstraint extends UIComponent {
             FlexConstraint flexConstraint = (FlexConstraint) wConst;
             if (getParent() != null) {
                 UIConstraint maxConstraint = getParent().getMaxX(this);
-                if(maxConstraint != null){
+                if (maxConstraint != null) {
                     this.w = ((maxConstraint.x + maxConstraint.w) + flexConstraint.getOffset()) - 10;
                 }
             }
@@ -253,15 +251,6 @@ public class UIConstraint extends UIComponent {
         if (hConst instanceof PixelConstraint) {
             PixelConstraint heightConst = (PixelConstraint) hConst;
             this.h = heightConst.getPixel();
-        } else if (hConst instanceof FlexConstraint) {
-            FlexConstraint flexConstraint = (FlexConstraint) hConst;
-            if (getParent() != null) {
-                UIConstraint maxConstraint = getParent().getMaxY(this);
-                if(maxConstraint != null){
-                    this.h = maxConstraint.y;
-                    this.h = ((maxConstraint.y  - this.y) + maxConstraint.h) + flexConstraint.getOffset();
-                }
-            }
         } else if (hConst instanceof AspectConstraint) {
             AspectConstraint aspectConstraint = (AspectConstraint) hConst;
             //this will simply keep the height the size of the width * the aspect
@@ -274,7 +263,7 @@ public class UIConstraint extends UIComponent {
 
             if (yConst != null && yConst instanceof StickyConstraint) {
                 StickyConstraint yConstraint = (StickyConstraint) yConst;
-                if(yConstraint.hasRelativeConstraint()){
+                if (yConstraint.hasRelativeConstraint()) {
                     parentHeight -= yConstraint.getRelativeConstraint().y + yConstraint.getRelativeConstraint().h;
                 }
             }
@@ -320,17 +309,15 @@ public class UIConstraint extends UIComponent {
 
             override.wOverride.ifPresent(wOver -> this.w = wOver);
             override.hOverride.ifPresent(hOver -> this.h = hOver);
-            if((override.wOffOverride.isPresent() || override.hOffOverride.isPresent() ) && !offsetAdded){
+            if ((override.wOffOverride.isPresent() || override.hOffOverride.isPresent()) && !offsetAdded) {
                 override.wOffOverride.ifPresent(wOffOver -> this.w += wOffOver);
                 override.hOffOverride.ifPresent(hOffOver -> this.h += hOffOver);
                 offsetAdded = true;
             }
-
         }
-
     }
 
-    private boolean offsetAdded =false;
+    private boolean offsetAdded = false;
 
     private void processPosConstraints(float parentX, float parentY, float parentWidth, float parentHeight) {
         if (yConst instanceof PixelConstraint) {

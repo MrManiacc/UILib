@@ -11,6 +11,7 @@ public class UISeparator extends UIComponent implements UIRenderable {
 
     public UISeparator(UIColor color) {
         this.color = color;
+        setRender(true);
     }
 
     @Override
@@ -20,22 +21,10 @@ public class UISeparator extends UIComponent implements UIRenderable {
                 remove(uiComponent);
             UIConstraint uiConstraint = (UIConstraint) super.add(uiComponent);
             this.constraints = uiConstraint;
+            this.constraints.update();
             return uiConstraint;
         }
         return super.add(uiComponent);
-    }
-
-    @Override
-    public void setParent(UIComponent parent) {
-        if (constraints == null) {
-            add(new UIConstraint()
-                    .setXConst(new CenterConstraint())
-                    .setYConst(new StickyConstraint(StickyConstraint.FACE.BOTTOM, new PixelConstraint(-4)))
-                    .setWConst(new RelativeConstraint())
-                    .setHConst(new PixelConstraint(1)));
-        }
-        setRender(true);
-        super.setParent(parent);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package me.jraynor.gui.elements;
 
 import lombok.Getter;
+import lombok.Setter;
 import me.jraynor.gui.logic.UIComponent;
 import me.jraynor.gui.logic.color.UIColor;
 import me.jraynor.gui.logic.constraint.Constraints;
@@ -9,10 +10,12 @@ import me.jraynor.gui.misc.UIRenderable;
 
 import static me.jraynor.gui.logic.constraint.Constraints.*;
 import static me.jraynor.gui.logic.constraint.Constraints.ManualConstraint.NO_OVERRIDE;
+import static me.jraynor.gui.logic.constraint.Constraints.StickyConstraint.FACE.LEFT;
 import static org.lwjgl.nanovg.NanoVG.*;
 
 public class UIText extends UIComponent implements UIRenderable {
     @Getter
+    @Setter
     private String text;
     private UIConstraint constraints;
     private int fontSize = 18;
@@ -22,7 +25,7 @@ public class UIText extends UIComponent implements UIRenderable {
     private UIConstraint parentConstraint;
     private boolean fill = false;
 
-    public UIText(String text) {
+    public UIText(String o) {
         this.text = text;
         this.fontFamily = "regular";
     }
@@ -60,14 +63,21 @@ public class UIText extends UIComponent implements UIRenderable {
     @Override
     protected void onUpdate() {
         if (constraints != null && vg != 0) {
-            if (constraints.getOverride() == null && getParent() != null) {
+            if (getParent() != null) {
                 constraints.update();
                 nvgSave(vg);
                 nvgFontSize(vg, fontSize);
                 nvgFontFace(vg, fontFamily);
                 calcTextBounds(vg, constraints.x, constraints.y, text, textBounds);
                 nvgRestore(vg);
-                constraints.setOverride(new ManualConstraint(NO_OVERRIDE, NO_OVERRIDE, textBounds[2] + 4, textBounds[3] - textBounds[1]));
+                if (constraints.getOverride() == null) {
+                    constraints.setOverride(new ManualConstraint(NO_OVERRIDE, NO_OVERRIDE, textBounds[2] + 4, textBounds[3] - textBounds[1]));
+                } else {
+                    constraints.getOverride().setW(textBounds[2]);
+                    constraints.getOverride().setH(textBounds[3] - textBounds[1]);
+                }
+
+
                 setRender(true);
                 if (getParent().hasComponent(UIConstraint.class)) {
                     UIConstraint constraint = (UIConstraint) getParent().getComponent(UIConstraint.class);

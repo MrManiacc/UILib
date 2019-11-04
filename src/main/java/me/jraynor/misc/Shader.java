@@ -1,5 +1,6 @@
 package me.jraynor.misc;
 
+import lombok.Getter;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
@@ -24,6 +25,8 @@ public abstract class Shader {
     private String path = "src/main/resources/shaders/";
     private final Map<String, Integer> uniforms;
     private final FloatBuffer matrixBuffer;
+    @Getter
+    private boolean started = false;
 
     public Shader(String name) {
         this.path += name + ".glsl";
@@ -99,6 +102,7 @@ public abstract class Shader {
      */
     public void start() {
         GL20.glUseProgram(programID);
+        started = true;
     }
 
     /**
@@ -106,6 +110,7 @@ public abstract class Shader {
      */
     public void stop() {
         GL20.glUseProgram(0);
+        started = false;
     }
 
     /**

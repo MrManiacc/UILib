@@ -6,6 +6,9 @@ import me.jraynor.gui.logic.color.UIColor;
 import me.jraynor.gui.logic.constraint.UIConstraint;
 import me.jraynor.gui.misc.UIRenderable;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class UIBlock extends UIComponent implements UIRenderable {
     @Getter
@@ -14,16 +17,19 @@ public class UIBlock extends UIComponent implements UIRenderable {
     private UIConstraint constraints;
     @Getter
     private UIDropShadow dropShadow;
+    private List<UIComponent> addLater = new ArrayList<>();
 
     public UIBlock(UIColor color, UIConstraint constraint) {
         this.color = (UIColor) add(color);
         this.constraints = (UIConstraint) add(constraint);
         this.setRender(true);
+        setRender(true);
     }
 
     public UIBlock(UIColor color) {
         this.color = (UIColor) add(color);
         this.setRender(true);
+        setRender(true);
     }
 
     /**
@@ -41,10 +47,14 @@ public class UIBlock extends UIComponent implements UIRenderable {
     @Override
     protected void onAdded() {
         if (this.constraints == null && getParent() != null) {
-            if (getParent().hasComponent(UIConstraint.class)){
+            if (getParent().hasComponent(UIConstraint.class)) {
                 this.constraints = (UIConstraint) getParent().getComponent(UIConstraint.class);
                 this.constraints.update();
             }
+        }
+
+        for (UIComponent component : addLater) {
+            add(component);
         }
     }
 
@@ -68,6 +78,11 @@ public class UIBlock extends UIComponent implements UIRenderable {
     }
 
     @Override
+    public void update() {
+        super.update();
+    }
+
+    @Override
     protected void render() {
         if (constraints != null) {
             if (!constraints.isRounded()) {
@@ -78,5 +93,9 @@ public class UIBlock extends UIComponent implements UIRenderable {
                 drawDropShadow(vg, dropShadow.getXOffset(), dropShadow.getYOffset(), constraints.getxConst(), constraints.getyConst(), constraints.getwConst(), constraints.gethConst(), dropShadow.getRound(), dropShadow.getBlur(), dropShadow.getSpread(), dropShadow.getInnerColor(), dropShadow.getOuterColor(), dropShadow.getVgPaint());
             }
         }
+    }
+
+    public void addLater(UIComponent uiComponent) {
+        addLater.add(uiComponent);
     }
 }

@@ -236,7 +236,7 @@ public class Window {
         glfwSwapInterval(vSync ? 1 : 0);
         glfwShowWindow(window);
         GL.createCapabilities();
-        glClearColor(0.5f, 0.5f, 0.5f, 0.0f);
+        glClearColor(0, 0, 0, 0.0f);
     }
 
 
@@ -246,27 +246,25 @@ public class Window {
      * @param engine the class to be updated
      */
     private void loopCallback(IEngine engine) {
-        double passed = System.nanoTime();
-        double counter = 0;
+        long passed = System.currentTimeMillis();
+        long counter = 0;
         while (!glfwWindowShouldClose(window)) {
 
-            long current = System.nanoTime();
-            double delta = (float) ((current - passed) / 1E9);
+            long current = System.currentTimeMillis();
+            double delta =current - passed;
             passed = current;
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
             engine.render(delta);
             nvgBeginFrame(vg, width, height, 1);
+            nvgSave(vg);
             engine.renderUI(delta);
+            nvgRestore(vg);
             nvgEndFrame(vg);
 
 
-            if (counter <= 0.05) {
-                counter += delta;
-            } else {
-                engine.update(counter);
-                counter = 0;
-            }
+            engine.update(delta);
+            counter = 0;
             Input.update();
 
             glfwSwapBuffers(window);
